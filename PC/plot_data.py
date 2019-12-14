@@ -34,10 +34,26 @@ if __name__ == '__main__':
 
     init_time = datetime.now()
 
-    while((datetime.now() - init_time).seconds < 10):
+    while((datetime.now() - init_time).seconds < 3):
         data = np.append(data, GetData(ser), axis=0)
         print(len(data), (datetime.now() - init_time).seconds)
 
 
-    plt.plot(data[:, 1], data[:, 2])
+    data1 = data[data[:, 0] == 1]
+    data2 = data[data[:, 0] == 2]
+    data3 = data[data[:, 0] == 3]
+    data4 = data[data[:, 0] == 4]
+
+
+    fig, ax = plt.subplots(2, 2, figsize=(8, 8))
+    ax[0, 0].plot(data1[:, 1], data1[:, 2])
+    ax[0, 1].plot(data2[:, 1], data2[:, 2])
+    ax[1, 0].plot(data3[:, 1], data3[:, 2])
+    ax[1, 1].plot(data4[:, 1], data4[:, 2])
+
+    ax[0, 0].set_title("MSU 1")
+    ax[0, 1].set_title("MSU 2")
+    ax[1, 0].set_title("MSU 3")
+    ax[1, 1].set_title("MSU 4")
+
     plt.show()
