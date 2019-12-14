@@ -44,7 +44,9 @@ void handleLogin() {                         // If a POST request is made to URI
     server.send(200, "text/html", "<h1>Welcome, " + server.arg("username") + "!</h1><p>OK</p>");
     Serial.print(server.arg("id"));
     Serial.print("\t");
-    Serial.println(server.arg("time"));
+    Serial.print(server.arg("time"));
+    Serial.print("\t");
+    Serial.println(server.arg("noise"));
   }
 }
 
