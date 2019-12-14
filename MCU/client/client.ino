@@ -1,23 +1,20 @@
-/*
- *  This sketch sends data via HTTP GET requests to data.sparkfun.com service.
- *
- *  You need to get streamId and privateKey at data.sparkfun.com and paste them
- *  below. Or just customize this script to talk to other HTTP servers.
- *
- */
+#define SOUND_PIN  35 //microphone pins must be set to 32 and higher to work with WIFI
+#define NOISE_PIN  32 
 
 #include <WiFi.h>
 
 const char* ssid     = "ESP8266";
 const char* password = "1234567890";
-
-const uint8_t ID = 1;
-
+const uint8_t ID = 5;
 const char* host = "192.168.4.1";
-
+int soundValue = 0;
+int noiseValue = 0;
 
 void setup()
 {
+    pinMode(SOUND_PIN, INPUT);
+    pinMode(NOISE_PIN, INPUT);
+  
     Serial.begin(115200);
     delay(10);
 
@@ -41,20 +38,8 @@ void setup()
     Serial.println(WiFi.localIP());
 }
 
-int value = 0;
-
-void loop()
+void senddata()
 {
-    delay(5000);
-    ++value;
-    
-
-    Serial.print("connecting to ");
-    Serial.println(host);
-    
-    //ttp://192.168.4.1/api/login?id=John Doe&time=password123
-    
-    // Use WiFiClient class to create TCP connections
     WiFiClient client;
     const int httpPort = 80;
     if (!client.connect(host, httpPort)) {
@@ -68,9 +53,11 @@ void loop()
     url += String(ID);
     url += "&time=";
     url += String(millis(), DEC);
+    url += "&noise=";
+    url += String(noiseValue);
 
-    Serial.print("Requesting URL: ");
-    Serial.println(url);
+    //Serial.print("Requesting URL: ");
+    //Serial.println(url);
 
     // This will send the request to the server
     client.print(String("POST ") + url + " HTTP/1.1\r\n" +
@@ -83,15 +70,16 @@ void loop()
             Serial.println(">>> Client Timeout !");
             client.stop();
             return;
-        }
+       }
     }
+ }
 
-    // Read all the lines of the reply from server and print them to Serial
-    while(client.available()) {
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-    }
-
-    Serial.println();
-    Serial.println("closing connection");
+void loop()
+{
+    soundValue = analogRead(SOUND_PIN);     // считываем показания микрофона
+    noiseValue = analogRead(NOISE_PIN);     // считываем показания уровня шума
+    //Serial.println(noiseValue);
+     if (noiseValue > 200){
+     Serial.println(noiseValue);
+     senddata();}
 }
